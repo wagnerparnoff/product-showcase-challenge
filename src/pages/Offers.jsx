@@ -1,6 +1,18 @@
 import './Offers.css'
+import useProducts from "../hooks/useProducts.jsx";
+import ProductGrid from "../components/ProductGrid.jsx";
 
 function Offers() {
+
+  // const { width, isMobile } = useViewport();
+  // const itemsPerPage = width >= 1024 ? 9 : width >= 640 ? 6 : 4;
+
+  const {
+    loading,
+    error,
+    products,
+  } = useProducts();
+
   return (
     <main className="offers-page">
       <header>
@@ -18,9 +30,17 @@ function Offers() {
         </div>
       </header>
 
-      <section className="offers-section">
-        <div className="offers-container">
-        </div>
+      <section
+        className="offers-section"
+        aria-label="Vitrine de produtos em oferta"
+      >
+        {loading && <p>Carregando produtos...</p>}
+        {error && <p>{error}</p>}
+        {!loading && !error && (
+          <>
+            <ProductGrid products={products} />
+          </>
+        )}
       </section>
     </main>
   );
