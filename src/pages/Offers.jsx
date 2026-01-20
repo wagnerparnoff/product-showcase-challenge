@@ -1,17 +1,34 @@
+import { useState, useMemo } from 'react';
 import './Offers.css'
 import useProducts from "../hooks/useProducts.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
+import Pagination from "../components/Pagination.jsx";
+import useViewport from "../hooks/useViewport.jsx";
 
 function Offers() {
-
-  // const { width, isMobile } = useViewport();
-  // const itemsPerPage = width >= 1024 ? 9 : width >= 640 ? 6 : 4;
+  const { width } = useViewport();
+  const itemsPerPage = width >= 1024 ? 6 : width >= 640 ? 4 : 3;
+  
+  const [currentPage, setCurrentPage] = useState(1);
 
   const {
     loading,
     error,
     products,
   } = useProducts();
+
+  const currentProducts = useMemo(() => {
+    const firstPageIndex = (currentPage - 1) * itemsPerPage;
+    const lastPageIndex = firstPageIndex + itemsPerPage;
+    return products.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage, itemsPerPage, products]);
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <main className="offers-page">
@@ -38,7 +55,12 @@ function Offers() {
         {error && <p>{error}</p>}
         {!loading && !error && (
           <>
-            <ProductGrid products={products} />
+            <ProductGrid products={currentProducts} />
+            <Pagination 
+              currentPage={currentPage} 
+              totalPages={totalPages} 
+              onPageChange={handlePageChange}
+            />
           </>
         )}
       </section>
