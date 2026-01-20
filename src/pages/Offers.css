@@ -62,6 +62,46 @@
   gap: 1.5rem;
 }
 
+@media (max-width: 1200px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .offers-header-content h1 {
+    font-size: 2rem;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .offers-header {
+    padding-top: 1.5rem;
+  }
+
+  .offers-banner-image {
+    height: 180px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .offers-header-content h1 {
+    font-size: 1.75rem;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Card de produto */
 .product-card {
   background-color: #ffffff;
