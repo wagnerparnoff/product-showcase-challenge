@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import './Offers.css'
 import useProducts from "../hooks/useProducts.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
 import Pagination from "../components/Pagination.jsx";
 import useViewport from "../hooks/useViewport.jsx";
+import FiltersBar from "../components/FiltersBar.jsx";
 
 function Offers() {
   const { width } = useViewport();
@@ -55,10 +56,20 @@ function Offers() {
         {error && <p>{error}</p>}
         {!loading && !error && (
           <>
+            <FiltersBar
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onCategoryChange={handleCategoryChange}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              priceRange={priceRange}
+              onPriceChange={handlePriceChange}
+              onClearFilters={handleClearFilters}
+            />
             <ProductGrid products={currentProducts} />
-            <Pagination 
-              currentPage={currentPage} 
-              totalPages={totalPages} 
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
               onPageChange={handlePageChange}
             />
           </>
