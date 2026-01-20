@@ -1,5 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
-import './Offers.css'
+import { useState, useMemo, useEffect } from "react";
+import "./Offers.css";
 import useProducts from "../hooks/useProducts.jsx";
 import ProductGrid from "../components/ProductGrid.jsx";
 import Pagination from "../components/Pagination.jsx";
@@ -9,26 +9,63 @@ import FiltersBar from "../components/FiltersBar.jsx";
 function Offers() {
   const { width } = useViewport();
   const itemsPerPage = width >= 1024 ? 6 : width >= 640 ? 4 : 3;
-  
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const {
-    loading,
-    error,
-    products,
-  } = useProducts();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [priceRange, setPriceRange] = useState([0, 10000]);
+
+  const { loading, error, products } = useProducts();
+
+  const { categories, minPrice, maxPrice } = useMemo(() => {
+    if (!products.length)
+      return { categories: [], minPrice: 0, maxPrice: 1000 };
+
+    const cats = [...new Set(products.map((p) => p.category))];
+    const prices = products.map((p) => p.price);
+    const min = Math.floor(Math.min(...prices));
+    const max = Math.ceil(Math.max(...prices));
+
+    return { categories: cats, minPrice: min, maxPrice: max };
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const matchCategory = selectedCategory
+        ? product.category === selectedCategory
+        : true;
+      const matchPrice =
+        product.price >= priceRange[0] && product.price <= priceRange[1];
+      return matchCategory && matchPrice;
+    });
+  }, [products, selectedCategory, priceRange]);
 
   const currentProducts = useMemo(() => {
     const firstPageIndex = (currentPage - 1) * itemsPerPage;
     const lastPageIndex = firstPageIndex + itemsPerPage;
-    return products.slice(firstPageIndex, lastPageIndex);
-  }, [currentPage, itemsPerPage, products]);
+    return filteredProducts.slice(firstPageIndex, lastPageIndex);
+  }, [currentPage, itemsPerPage, filteredProducts]);
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);
+  };
+
+  const handlePriceChange = (newRange) => {
+    setPriceRange(newRange);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSelectedCategory("");
+    setPriceRange([minPrice, maxPrice]);
+    setCurrentPage(1);
   };
 
   return (
